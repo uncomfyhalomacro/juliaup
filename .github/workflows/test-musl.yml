@@ -1,0 +1,43 @@
+name: Test(Musl)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.head_ref || github.ref_name || github.run_id }} 
+  cancel-in-progress: true
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: 'alpine/${{ matrix.arch }}:latest'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [
+          x86_64,
+          i686,
+          aarch64
+          ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Prepare container
+        run: |
+          sudo apk add pkgconfig openssl-dev musl-dev gcc cargo
+
+      - name: Check
+        run: |
+          cargo check --release --bins --features selfupdate
+
+      - name: Test
+        run: |
+          cargo test --features selfupdate
