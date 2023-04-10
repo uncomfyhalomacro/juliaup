@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [armv7, aarch64, x86_64]
+        platform: [armv7, aarch64, x86_64, i686]
 
     steps:
       - uses: actions/checkout@v3
