@@ -95,7 +95,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - if: ${{ contains(matrix.target, '-musl') }}
-      run: sudo apt-get install musl-tools
+      container:
+        image: alpine:latest
+      steps:
+        - name: Prepare alpine container
+          run: |
+            sudo apk add pkgconfig openssl-dev musl-dev gcc cargo
+
+        - name: Check build
+          run: |
+            cargo check --release --bins --target ${{matrix.target}} --features ${{matrix.features}}
+
+    - if: ${{ matrix.os == 'ubuntu' }}
+      run: sudo apt-get install libssl-dev pkg-config
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
@@ -147,7 +159,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - if: ${{ contains(matrix.target, '-musl') }}
-      run: sudo apt-get install musl-tools
+      container:
+        image: alpine:latest
+      steps:
+        - name: Prepare alpine container
+          run: |
+            sudo apk add pkgconfig openssl-dev musl-dev gcc cargo
+
+        - name: Test
+          run: |
+            cargo test --target ${{matrix.target}} --features ${{matrix.features}}
+
+    - if: ${{ matrix.os == 'ubuntu' }}
+      run: sudo apt-get install libssl-dev pkg-config
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
