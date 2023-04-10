@@ -14,20 +14,19 @@ concurrency:
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.platform }}
 
     container:
-      image: 'alpine/${{ matrix.arch }}:latest'
+      image: 'alpine:latest'
+      options: --platform=linux/${{ matrix.platform }}
 
     strategy:
       fail-fast: false
       matrix:
-        architecture: [amd64, arm64, ppc64le, s390x]
+        platform: [armv7, aarch64, x86_64]
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          platforms: ${{ matrix.architecture }}
       - name: Prepare container
         run: |
           sudo apk add pkgconfig openssl-dev musl-dev gcc cargo
